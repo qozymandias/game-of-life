@@ -1,27 +1,18 @@
 #include "./frontend.hpp"
+#include <ncurses.h>
 #include <string>
 
 auto main(int argc, char** argv) -> int {
-    (void)argc;
-    (void)argv;
+    if (argc < 2) {
+        std::cout << "provide window size n\n";
+        return 1;
+    }
 
-    auto b = life::board_t{
-        {1, 1, 0, 0, 0, 1, 0, 0, 0, 0},
-        {0, 1, 0, 0, 1, 0, 0, 0, 0, 0},
-        {0, 1, 0, 0, 0, 1, 0, 0, 0, 0},
-        {0, 1, 0, 0, 1, 0, 0, 0, 0, 0},
-        {0, 1, 0, 0, 1, 1, 1, 0, 0, 0},
-        {0, 1, 0, 0, 1, 0, 1, 0, 0, 0},
-        {0, 1, 0, 0, 0, 1, 1, 0, 0, 0},
-        {0, 1, 0, 0, 1, 0, 1, 0, 0, 0},
-        {0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
-        {0, 1, 0, 0, 1, 0, 1, 0, 0, 0},
-    };
-    auto win = frontend::window();
-    win.init();
-
+    int n = std::stoi(std::string{argv[1]});
+    std::cout << n << '\n';
+    auto win = frontend::window(n, {0, n});
+    frontend::window::init();
     win.run();
-
 
     return 0;
 }

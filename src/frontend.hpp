@@ -14,10 +14,10 @@ namespace frontend {
 
     class window {
      public:
-        window() {
-            window_ = initscr();
-            auto gol = std::make_unique<life::game_of_life>(20);
+        explicit window(int const size, std::pair<int, int> const& range) {
+            auto gol = life::game_of_life(size);
             api_ = std::make_unique<life::run_api>(gol);
+            api_->get_gol().populate_cell(range.first, range.second);
         }
 
         ~window() {
@@ -28,51 +28,26 @@ namespace frontend {
             return window_;
         }
 
-        auto init() -> void {
-            game_init(window_);
-            api_->get_gol()->populate_cell();
+        static auto init() -> void {
+            game_init();
         }
 
         auto run() -> void {
-            do {
-                api_->run(1, get_window(), &waddstr);
-                wrefresh(get_window());
+            while (true) {
+                api_->run(1, &addstr);
             }
-            while(true);
+        }
+
+        static auto game_init() -> void {
+            initscr();
+            cbreak();
+            noecho();
+            clear();
+            refresh();
         }
 
      private:
         WINDOW* window_;
         std::unique_ptr<life::run_api> api_;
-
-        static auto game_init(WINDOW* wnd) -> void {
-            cbreak();
-            noecho();
-            clear();
-            refresh();
-
-            // enable function keys
-            keypad(wnd, true);
-
-            // disable input blocking
-            nodelay(wnd, true);
-
-            // hide cursor
-            curs_set(0);
-
-            if (!has_colors()) {
-                endwin();
-                printf("ERROR: Terminal does not support color.\n");
-                throw std::runtime_error("boom!");
-            }
-
-            // enable color modification
-            start_color();
-
-            // draw box around screen
-            attron(A_BOLD);
-            box(wnd, 0, 0);
-            attroff(A_BOLD);
-        }
     };
 } // namespace frontend
