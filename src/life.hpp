@@ -19,8 +19,7 @@ namespace life {
     using board_t = std::vector<std::vector<int>>;
 
     class game_of_life {
-    private:
-
+     private:
         board_t board_;
         std::random_device rd_;
         std::mt19937 mt_;
@@ -38,10 +37,14 @@ namespace life {
         : board_{std::move(b)} {};
 
         game_of_life(game_of_life& g) noexcept
-            : board_{g.board_}, mt_{g.mt_}, normal_dist_{g.normal_dist_} {}
+        : board_{g.board_}
+        , mt_{g.mt_}
+        , normal_dist_{g.normal_dist_} {}
 
         game_of_life(game_of_life&& g) noexcept
-            : board_{std::move(g.board_)}, mt_{g.mt_}, normal_dist_{g.normal_dist_} {}
+        : board_{std::move(g.board_)}
+        , mt_{g.mt_}
+        , normal_dist_{g.normal_dist_} {}
 
         [[nodiscard]] auto get_board() const -> board_t {
             return board_;
@@ -91,7 +94,6 @@ namespace life {
         }
 
      private:
-
         static auto count_live_neighbors(board_t const& board, int x, int y) -> int {
             auto m = static_cast<int>(board.size());
             auto n = static_cast<int>(board[0].size());
@@ -108,9 +110,9 @@ namespace life {
             return std::accumulate(row.begin(),
                                    row.end(),
                                    std::string{""},
-               [delim](auto acc, auto const& x) -> std::string {
-                   return acc + (x == 0b1 ? '*' : ' ') + delim;
-               })
+                                   [delim](auto acc, auto const& x) -> std::string {
+                                       return acc + (x == 0b1 ? '*' : ' ') + delim;
+                                   })
                    + '\n';
         }
 
@@ -124,7 +126,8 @@ namespace life {
 
     class interface {
      public:
-        explicit interface(int const size) : gol_{life::game_of_life(size)} {};
+        explicit interface(int const size)
+        : gol_{life::game_of_life(size)} {};
         ~interface() = default;
 
         auto get_gol() -> life::game_of_life& {
@@ -132,9 +135,8 @@ namespace life {
         }
 
         auto run(int latency, WINDOW* wind, std::function<int(WINDOW*, const char*)> const& printer) -> void {
-            auto timer_thread = std::thread([latency]() -> void { 
-                std::this_thread::sleep_for(std::chrono::microseconds(latency)); 
-            });
+            auto timer_thread = std::thread(
+                [latency]() -> void { std::this_thread::sleep_for(std::chrono::microseconds(latency)); });
             auto update_print_thread = std::thread([&wind, &printer, this]() -> void {
                 wclear(wind);
                 gol_.update();

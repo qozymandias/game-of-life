@@ -16,7 +16,9 @@ namespace frontend {
      public:
         // NOLINTNEXTLINE
         explicit window(int const size, int const tick)
-            : tick_{tick}, window_{initscr()}, api_{std::make_unique<life::interface>(size)} { }
+        : tick_{tick}
+        , window_{initscr()}
+        , api_{std::make_unique<life::interface>(size)} {}
 
         ~window() {
             endwin();
