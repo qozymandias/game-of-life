@@ -7,47 +7,47 @@
 
 namespace frontend {
 
-    struct player {
-        std::pair<int, int> pos;
-        char disp_char;
-    };
-
     class window {
+     private:
+        int tick_;
+        WINDOW* window_;
+        std::unique_ptr<life::interface> api_;
+
      public:
-        explicit window(int const size, std::pair<int, int> const& range) {
-            auto gol = life::game_of_life(size);
-            api_ = std::make_unique<life::run_api>(gol);
-            api_->get_gol().populate_cell(range.first, range.second);
-        }
+        // NOLINTNEXTLINE
+        explicit window(int const size, int const tick)
+            : tick_{tick}, window_{initscr()}, api_{std::make_unique<life::interface>(size)} { }
 
         ~window() {
             endwin();
         }
 
-        auto get_window() -> WINDOW* {
-            return window_;
-        }
-
-        static auto init() -> void {
-            game_init();
-        }
-
-        auto run() -> void {
+        auto run() const -> void {
             while (true) {
-                api_->run(1, &addstr);
+                api_->run(tick_, window_, &waddstr);
             }
         }
 
-        static auto game_init() -> void {
-            initscr();
+        [[nodiscard]] auto init(std::pair<int, int> const& range) const -> int {
+            api_->get_gol().populate_cell(range.first, range.second);
+
             cbreak();
             noecho();
             clear();
             refresh();
-        }
 
-     private:
-        WINDOW* window_;
-        std::unique_ptr<life::run_api> api_;
+            keypad(window_, true);
+            nodelay(window_, true);
+            curs_set(0);
+
+            if (!has_colors()) {
+                throw std::runtime_error("ERROR: Terminal does not support color.\n");
+            }
+            start_color();
+            attron(A_BOLD);
+            box(window_, 0, 0);
+            attroff(A_BOLD);
+            return 0;
+        }
     };
 } // namespace frontend

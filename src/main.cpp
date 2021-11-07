@@ -7,12 +7,12 @@ auto main(int argc, char** argv) -> int {
         std::cout << "provide window size n\n";
         return 1;
     }
+    int tick = 800000;
+    int const& n = std::stoi(std::string{argv[1]});
+    auto const win = frontend::window(n, tick);
 
-    int n = std::stoi(std::string{argv[1]});
-    std::cout << n << '\n';
-    auto win = frontend::window(n, {0, n});
-    frontend::window::init();
-    win.run();
-
+    if (win.init({0, n * 0.55}) == 0) {
+        win.run();
+    }
     return 0;
 }
